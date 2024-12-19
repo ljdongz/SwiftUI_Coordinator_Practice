@@ -8,29 +8,59 @@
 import SwiftUI
 
 struct CoordinatorView: View {
-  @State private var coordinator = Coordinator()
+  @State private var onboardingCoordinator = OnboardingCoordinator()
+  @State private var mainCoordinator = MainCoordinator()
+  @State private var rootSwitcher = RootSwitcher()
   
   var body: some View {
-    NavigationStack(path: $coordinator.path) {
-      Group {
-        switch coordinator.root {
-        case .onboarding:
-          coordinator.buildPage(page: .onboarding)
-        case .main:
-          coordinator.buildPage(page: .main)
-        }
-      }
-      .onOpenURL { url in
-        coordinator.presentSheetFromWidget(.forgotPassword(id: "test"))
-      }
-      .navigationDestination(for: AppPage.self) { page in
-        coordinator.buildPage(page: page)
-      }
-      .sheet(item: $coordinator.sheet) { sheet in
-        coordinator.buildSheet(sheet: sheet)
+    Group {
+      switch rootSwitcher.root {
+      case .onboarding:
+        onboardingView
+      case .main:
+        mainView
       }
     }
-    .environment(coordinator)
+    .environment(rootSwitcher)
+    .onChange(of: rootSwitcher.root) { oldValue, _ in
+      switch oldValue {
+      case .onboarding:
+        onboardingCoordinator.popToRoot()
+      case .main:
+        mainCoordinator.popToRoot()
+      }
+    }
+  }
+  
+  @ViewBuilder
+  private var onboardingView: some View {
+    NavigationStack(path: $onboardingCoordinator.path) {
+      onboardingCoordinator.buildPage(.onboarding)
+        .navigationDestination(for: OnboardingPage.self) { page in
+          onboardingCoordinator.buildPage(page)
+        }
+    }
+    .environment(onboardingCoordinator)
+  }
+  
+  @ViewBuilder
+  private var mainView: some View {
+    NavigationStack(path: $mainCoordinator.path) {
+      mainCoordinator.buildPage(.main)
+        .navigationDestination(for: MainPage.self) { page in
+          mainCoordinator.buildPage(page)
+        }
+        .sheet(item: $mainCoordinator.sheet) { sheet in
+          mainCoordinator.buildSheet(sheet)
+        }
+        .onOpenURL { url in
+          if rootSwitcher.root == .main {
+            mainCoordinator.popToRoot()
+            mainCoordinator.sheet = .forgotPassword(id: "Widget")
+          }
+        }
+    }
+    .environment(mainCoordinator)
   }
 }
 

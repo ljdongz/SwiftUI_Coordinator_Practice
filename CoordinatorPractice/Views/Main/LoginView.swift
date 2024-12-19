@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct LoginView: View {
-  @Environment(Coordinator.self) var coordinator
+  @Environment(MainCoordinator.self) var coordinator
+  @Environment(RootSwitcher.self) var rootSwitcher
   
   var date: Date
+  
   var body: some View {
     Text("Login")
     Text("\(date.description)")
@@ -21,10 +23,15 @@ struct LoginView: View {
       Text("Pop to root")
     }
     
+    Button {
+      rootSwitcher.switchRootView()
+    } label: {
+      Text("Change Root to Onboarding")
+    }
   }
 }
 
 #Preview {
   LoginView(date: Date())
-    .environment(Coordinator())
+    .environment(MainCoordinator())
 }

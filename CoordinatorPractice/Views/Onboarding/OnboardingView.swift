@@ -8,24 +8,20 @@
 import SwiftUI
 
 struct OnboardingView: View {
-  @Environment(Coordinator.self) var coordinator
+  @Environment(OnboardingCoordinator.self) var coordinator
+  @Environment(RootSwitcher.self) var rootSwitcher
+  
   var body: some View {
     Text("Onboarding")
     
     Button {
-      coordinator.changeRoot()
+      rootSwitcher.switchRootView()
     } label: {
       Text("Change Root to Main")
     }
     
     Button {
-      coordinator.push(page: .onboarding1)
-    } label: {
-      Text("Push")
-    }
-    
-    Button {
-      coordinator.push(page: .login(date: .now))
+      coordinator.push(.onboarding1)
     } label: {
       Text("Push")
     }
@@ -34,5 +30,5 @@ struct OnboardingView: View {
 
 #Preview {
   OnboardingView()
-    .environment(Coordinator())
+    .environment(OnboardingCoordinator())
 }

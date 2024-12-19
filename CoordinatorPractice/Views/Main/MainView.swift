@@ -8,14 +8,16 @@
 import SwiftUI
 
 struct MainView: View {
-  @Environment(Coordinator.self) var coordinator
+  @Environment(MainCoordinator.self) var coordinator
+  @Environment(RootSwitcher.self) var rootSwitcher
+  
   var body: some View {
     ZStack {
       Color.yellow.ignoresSafeArea()
       
       VStack {
         Button {
-          coordinator.push(page: .login(date: .now))
+          coordinator.push(.login(date: .now))
         } label: {
           Text("Login")
         }
@@ -26,7 +28,7 @@ struct MainView: View {
         }
 
         Button {
-          coordinator.changeRoot()
+          rootSwitcher.switchRootView()
         } label: {
           Text("Change Root to Onboarding")
         }
@@ -39,5 +41,5 @@ struct MainView: View {
 
 #Preview {
   MainView()
-    .environment(Coordinator())
+    .environment(MainCoordinator())
 }
